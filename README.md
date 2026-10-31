@@ -44,7 +44,7 @@ These contracts are live on the Ethereum Sepolia testnet. Sepolia ETH is test ET
 | `ALULogoToken` (ERC-20 ALUT) | [`0x639DC7FC83F206527F6E52BAc84C1d22ba66D51A`](https://sepolia.etherscan.io/address/0x639DC7FC83F206527F6E52BAc84C1d22ba66D51A) |
 | Token deploy transaction | [`0x40165ba0fed829bd1799f8919c9bb5a419f83fd8f9b7d5fed2e0684fc8f27281`](https://sepolia.etherscan.io/tx/0x40165ba0fed829bd1799f8919c9bb5a419f83fd8f9b7d5fed2e0684fc8f27281) |
 
-On Sepolia, `verifyLogoIntegrity(1)` returns `true` / `Logo is authentic.` and `ownershipPercentage` of the deployer returns `100`. Remix files with GitHub OpenZeppelin imports are in `contracts/remix/`.
+On Sepolia, `verifyLogoIntegrity(1)` returns `true` / `Logo is authentic.` and `ownershipPercentage` of the deployer returns `100`. Remix files with GitHub OpenZeppelin imports are in `remix/` (kept outside `contracts/` so Hardhat does not try to compile the `https` imports).
 
 ## Versions
 
@@ -123,13 +123,13 @@ npm run hash
 ```
 contracts/ALUAssetRegistry.sol         ERC-721 logo registry (Hardhat)
 contracts/ALULogoToken.sol             ERC-20 ownership shares (Hardhat)
-contracts/remix/                       Same contracts with Remix GitHub imports
+remix/                                 Same contracts with Remix GitHub imports
 scripts/deploy.js                      Deploys both contracts and registers the logo
 scripts/hash-logo.js                   Prints the SHA-256 of alu-logo.png
 test/ALUAssetRegistry.test.js          Eight automated tests
 alu-logo.png                           Official ALU logo used for the hash
 hardhat.config.js                      Solidity 0.8.24 / Hardhat configuration
-Project_Report.pdf                     Written report for Questions 1 and 2
+Project_Report.pdf                     Written report (portal / ZIP submission, not required on GitHub)
 ```
 
 ## Problems encountered and how they were resolved
