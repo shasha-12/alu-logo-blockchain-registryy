@@ -53,13 +53,38 @@ async function main() {
   const Token = await hre.ethers.getContractFactory("ALULogoToken");
   const token = await Token.deploy(deployer.address);
   await token.waitForDeployment();
+  const registryAddress = await registry.getAddress();
+  const tokenAddress = await token.getAddress();
   const ownerBalance = await token.balanceOf(deployer.address);
-  console.log("ALULogoToken deployed to:      ", await token.getAddress());
+  console.log("ALULogoToken deployed to:      ", tokenAddress);
   console.log(
     "ALUT minted to logo owner:     ",
     hre.ethers.formatUnits(ownerBalance, 18),
     "ALUT"
   );
+
+  const addressesPath = path.join(
+    __dirname,
+    "..",
+    "frontend",
+    "src",
+    "contracts",
+    "addresses.json"
+  );
+  let addresses = {};
+  if (fs.existsSync(addressesPath)) {
+    addresses = JSON.parse(fs.readFileSync(addressesPath, "utf8"));
+  }
+  const network = await hre.ethers.provider.getNetwork();
+  const chainKey = Number(network.chainId).toString();
+  addresses[chainKey] = {
+    ALUAssetRegistry: registryAddress,
+    ALULogoToken: tokenAddress,
+    officialTokenId: Number(tokenId),
+  };
+  fs.mkdirSync(path.dirname(addressesPath), { recursive: true });
+  fs.writeFileSync(addressesPath, JSON.stringify(addresses, null, 2) + "\n");
+  console.log("Saved frontend addresses to:   ", addressesPath);
   console.log("============================================================");
 }
 

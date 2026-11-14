@@ -10,6 +10,4 @@ typechain-assets/
 .DS_Store
 .venv/
 *.log
-docs/screenshots/pdf-preview/
-docs/screenshots/*.txt
 *.zip

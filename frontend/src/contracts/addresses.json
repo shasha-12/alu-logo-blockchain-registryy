@@ -1,0 +1,12 @@
+{
+  "31337": {
+    "ALUAssetRegistry": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "ALULogoToken": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "officialTokenId": 1
+  },
+  "11155111": {
+    "ALUAssetRegistry": "0xE75eFCb283302be123B837b456e7B4ecfb670E7b",
+    "ALULogoToken": "0x639DC7FC83F206527F6E52BAc84C1d22ba66D51A",
+    "officialTokenId": 1
+  }
+}

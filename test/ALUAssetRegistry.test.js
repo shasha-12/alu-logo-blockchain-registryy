@@ -139,3 +139,84 @@ describe("ALULogoToken", function () {
     expect(await token.ownershipPercentage(owner.address)).to.equal(40n);
   });
 });
+
+describe("Frontend dApp integration", function () {
+  const {
+    formatAlutAmount,
+    verificationView,
+    sha256FileToBytes32,
+  } = require("./helpers/dappViews");
+
+  const OFFICIAL_HASH =
+    "0x6d13df33f91ac85ecff9ac602118084bd3f681f9750a2a83266b7845cf183bbd";
+
+  let registry;
+  let token;
+  let owner;
+  let faculty;
+
+  beforeEach(async function () {
+    [owner, faculty] = await ethers.getSigners();
+
+    const Registry = await ethers.getContractFactory("ALUAssetRegistry");
+    registry = await Registry.deploy();
+    await registry.waitForDeployment();
+    await registry.registerAsset(LOGO_NAME, LOGO_TYPE, sha256File(LOGO_PATH));
+
+    const Token = await ethers.getContractFactory("ALULogoToken");
+    token = await Token.deploy(owner.address);
+    await token.waitForDeployment();
+  });
+
+  it("frontend reads total ALUT supply from the contract as 1,000,000", async function () {
+    const supplyWei = await token.totalSupply();
+    const displayed = formatAlutAmount(supplyWei);
+
+    expect(supplyWei).to.equal(TOTAL_SUPPLY);
+    expect(displayed).to.equal("1000000.0");
+    expect(Number(displayed)).to.equal(1000000);
+  });
+
+  it("hashing a file returns the correct SHA-256 hash in bytes32 format", async function () {
+    const hash = sha256FileToBytes32(LOGO_PATH);
+
+    expect(hash.startsWith("0x")).to.equal(true);
+    expect(hash.length).to.equal(66);
+    expect(hash).to.equal(OFFICIAL_HASH);
+    expect(hash).to.equal(sha256File(LOGO_PATH));
+  });
+
+  it("verifyLogoIntegrity with the correct hash produces a verification success result", async function () {
+    const result = await registry.verifyLogoIntegrity(1, OFFICIAL_HASH);
+    const view = verificationView(result.isAuthentic, result.message);
+
+    expect(result.isAuthentic).to.equal(true);
+    expect(view.status).to.equal("success");
+    expect(view.headline).to.equal("Logo Verified");
+  });
+
+  it("verifyLogoIntegrity with an incorrect hash produces a verification failure result", async function () {
+    const result = await registry.verifyLogoIntegrity(1, randomHash());
+    const view = verificationView(result.isAuthentic, result.message);
+
+    expect(result.isAuthentic).to.equal(false);
+    expect(view.status).to.equal("failure");
+    expect(view.headline).to.equal("Warning: This logo has been modified");
+  });
+
+  it("distributeShares updates the recipient balance after a successful transfer", async function () {
+    const amount = ethers.parseUnits("100000", 18);
+
+    expect(await token.balanceOf(faculty.address)).to.equal(0n);
+
+    await token.distributeShares(faculty.address, amount);
+
+    const recipientBalance = await token.balanceOf(faculty.address);
+    const displayed = formatAlutAmount(recipientBalance);
+
+    expect(recipientBalance).to.equal(amount);
+    expect(displayed).to.equal("100000.0");
+    expect(await token.ownershipPercentage(faculty.address)).to.equal(10n);
+    expect(await token.ownershipPercentage(owner.address)).to.equal(90n);
+  });
+});
